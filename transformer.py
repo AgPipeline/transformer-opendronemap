@@ -44,7 +44,7 @@ class __internal__():
         """
 
     @staticmethod
-    def check_for_image_file(path: str) -> bool:
+    def check_for_image_file(path):
         """Checks the specified path for image files. If a folder is specified,
            it's only searched to a depth of 1 (immediately inside of the folder)
         Arguments:
@@ -67,7 +67,7 @@ class __internal__():
         return False
 
     @staticmethod
-    def get_merge_options(path: str) -> dict:
+    def get_merge_options(path):
         """Merges the standard ODM settings with any overrides
         Arguments:
             path: optional file path to settings overrides
@@ -92,7 +92,7 @@ class __internal__():
         return args
 
     @staticmethod
-    def prepare_project_folder(files: list, default_folder: str) -> str:
+    def prepare_project_folder(files, default_folder):
         """Prepares the project folder
         Arguments:
             files: the list of files and folders to prepare
@@ -112,7 +112,7 @@ class __internal__():
         return working_folder
 
 
-def add_parameters(parser: argparse.ArgumentParser) -> None:
+def add_parameters(parser):
     """Adds parameters
     Arguments:
         parser: instance of argparse.ArgumentParser
@@ -123,7 +123,7 @@ def add_parameters(parser: argparse.ArgumentParser) -> None:
                     ("\n" + parser.epilog) if parser.epilog else ""
 
 
-def check_continue(transformer: transformer_class.Transformer, check_md: dict, transformer_md: dict, full_md: dict) -> tuple:
+def check_continue(transformer, check_md, transformer_md, full_md):
     """Checks if conditions are right for continuing processing
     Arguments:
         transformer: instance of transformer class
@@ -148,7 +148,7 @@ def check_continue(transformer: transformer_class.Transformer, check_md: dict, t
     return (-1001, "Unable to find an image file in files to process. Accepting files types: '%s'" % ", ".join(KNOWN_IMAGE_FILE_EXTS))
 
 
-def perform_process(transformer: transformer_class.Transformer, check_md: dict, transformer_md: dict, full_md: dict) -> dict:
+def perform_process(transformer, check_md, transformer_md, full_md):
     """Performs the processing of the data
     Arguments:
         transformer: instance of transformer class
