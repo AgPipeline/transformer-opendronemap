@@ -34,4 +34,4 @@ RUN [ -s /home/extractor/requirements.txt ] && \
 USER extractor
 ENTRYPOINT ["/home/extractor/entrypoint.py"]
 
-COPY *.py /home/extractor/
+COPY *.py settings.yaml /home/extractor/

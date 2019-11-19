@@ -199,7 +199,8 @@ class __internal__():
                 print(json.dumps(result, indent=2))
             if 'file' in type_parts or 'all' in type_parts:
                 if result_file_path:
-                    os.makedirs(os.path.dirname(result_file_path), exist_ok=True)
+                    if not os.path.exists(os.path.dirname(result_file_path)):
+                        os.makedirs(os.path.dirname(result_file_path))
                     with open(result_file_path, 'w') as out_file:
                         json.dump(result, out_file, indent=2)
                 else:
