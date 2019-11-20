@@ -1,5 +1,5 @@
 # Version 1.0 template-transformer-simple 
-FROM opendronemap/odm:0.7.0
+FROM opendronemap/odm:0.9.1
 LABEL maintainer="Chris Schnaufer <schnaufer@email.arizona.edu>"
 
 RUN useradd -u 49044 extractor \

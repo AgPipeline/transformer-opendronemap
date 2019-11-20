@@ -25,7 +25,10 @@ RESULT_FILES = {
         {'name': 'odm_georeferenced_model.boundary.json', 'type': 'shapefile'},
     ],
     'mve': {'name': 'mve_dense_point_cloud.ply', 'type': 'pointcloud'},
-    # TODO: Digital Elevation Model (dem) file(s)
+    'odm_dem': [
+        {'name': 'dsm.tif', 'type': 'dsm'},
+        {'name': 'dtm.tif', 'type': 'dtm'},
+    ]
 }
 
 class __internal__():
@@ -81,13 +84,10 @@ class __internal__():
         file_list = []
         for one_file in files:
             if os.path.isdir(one_file):
-                logging.debug("[HACK] folder: %s", one_file)
                 for file_name in os.listdir(one_file):
                     if not os.path.isdir(file_name) and __internal__.check_for_image_file(file_name):
-                        logging.debug("[HACK] folder/file: %s", str(os.path.join(one_file, file_name)))
                         file_list.append(os.path.join(one_file, file_name))
             elif __internal__.check_for_image_file(one_file):
-                logging.debug("[HACK] file: %s", one_file)
                 file_list.append(one_file)
 
         logging.debug("Found files: %s", str(file_list))
@@ -147,6 +147,7 @@ class __internal__():
                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
         # Wait for the script to finish
+        return_value = -1
         if proc:
             # Loop here processing the output until the proc finishes
             logging.info("Waiting for process to finish")
@@ -158,9 +159,10 @@ class __internal__():
                 # Sleep and try again for process to complete
                 time.sleep(1)
             logging.debug("Return code: %s", str(proc.returncode))
+            return_value = proc.returncode
 
         logging.debug('OpenDroneMap app finished - %s', datetime.datetime.now().isoformat())
-
+        return return_value
 
 def add_parameters(parser):
     """Adds parameters
@@ -216,7 +218,7 @@ def perform_process(transformer, check_md, transformer_md, full_md):
 
     # Process the images
     logging.debug("Calling ODM with project path: %s", str(project_path))
-    __internal__.run_stitch(project_path, transformer.args.odm_overrides)
+    stitch_code = __internal__.run_stitch(project_path, transformer.args.odm_overrides)
 
     # Provide a list of returned files
     files_md = []
@@ -233,5 +235,5 @@ def perform_process(transformer, check_md, transformer_md, full_md):
                 })
 
     return {'files': files_md,
-            'code': 0
+            'code': stitch_code
             }

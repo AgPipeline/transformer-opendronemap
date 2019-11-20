@@ -4,9 +4,14 @@
 import os
 import yaml
 
+# Override pylint to allow our trickery in setting up ODM
+# pylint: disable=wrong-import-position
+# Override the default settings with our settings
+from opendm import context
+context.settings_path = os.path.join(os.path.dirname(__file__), "settings.yaml")
 from opendm import config
-
 from stages.odm_app import ODMApp
+# pylint: enable=wrong-import-position
 
 # Forbidden OpenDroneMap setting overrides when using custom configuration
 NO_OVERRIDE_SETTINGS = ["project_path"]
@@ -30,7 +35,7 @@ def perform_work():
     with open(arg_file) as in_f:
         new_settings = yaml.safe_load(in_f)
 
-    print("[worker] getting config")
+    print("[worker] getting config using our settings: %s" % context.settings_path)
     args = config.config()
 
     print("[worker] merging config")
@@ -38,6 +43,7 @@ def perform_work():
         for name in new_settings:
             if name not in NO_OVERRIDE_SETTINGS:
                 setattr(args, name, new_settings[name])
+    print("[worker] config %s" % str(args))
 
     print("[worker] setting project path")
     args.project_path = project_path
