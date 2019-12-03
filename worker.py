@@ -32,8 +32,9 @@ def perform_work():
 
     new_settings = None
     print("[worker] loading settings")
-    with open(arg_file) as in_f:
-        new_settings = yaml.safe_load(in_f)
+    if arg_file:
+        with open(arg_file) as in_f:
+            new_settings = yaml.safe_load(in_f)
 
     print("[worker] getting config using our settings: %s" % context.settings_path)
     args = config.config()
