@@ -7,7 +7,9 @@ Below is a sample command line that shows how the OpenDroneMap Docker image coul
 An explanation of the command line options used follows.
 Be sure to read up on the [docker run](https://docs.docker.com/engine/reference/run/) command line for more information.
 
-```docker run --rm --mount "src=/home/test,target=/mnt,type=bind" agpipeline/opendronemap:2.0 --working_space "/mnt" --metadata "/mnt/test/experiment.json" "/mnt/2018-10-21"```
+```sh
+docker run --rm --mount "src=/home/test,target=/mnt,type=bind" agpipeline/opendronemap:2.0 --working_space "/mnt" --metadata "/mnt/test/experiment.json" "/mnt/2018-10-21"
+```
 
 This example command line assumes the source files are located in the `/home/test` folder of the local machine.
 The name of the image to run is `agpipeline/opendronemap:2.0`.
