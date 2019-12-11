@@ -9,7 +9,7 @@ import piexif
 
 import configuration
 
-# EXIF tags to look for
+# EXIF tags to look for, see https://www.exiv2.org/tags.html
 EXIF_ORIGIN_TIMESTAMP = 36867         # Capture timestamp
 EXIF_TIMESTAMP_OFFSET = 36881         # Timestamp UTC offset (general)
 EXIF_ORIGIN_TIMESTAMP_OFFSET = 36881  # Capture timestamp UTC offset
