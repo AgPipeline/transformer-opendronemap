@@ -9,10 +9,10 @@ import piexif
 
 import configuration
 
-# EXIF tags to look for
-EXIF_ORIGIN_TIMESTAMP = 36867         # Capture timestamp
+# EXIF tags to look for, see https://www.exiv2.org/tags.html
+EXIF_ORIGINAL_TIMESTAMP = 36867         # Capture timestamp
 EXIF_TIMESTAMP_OFFSET = 36881         # Timestamp UTC offset (general)
-EXIF_ORIGIN_TIMESTAMP_OFFSET = 36881  # Capture timestamp UTC offset
+EXIF_ORIGINAL_TIMESTAMP_OFFSET = 36881  # Capture timestamp UTC offset
 
 
 class __internal__():
@@ -61,13 +61,13 @@ class __internal__():
             return None if not value else value
 
         # Process the EXIF data
-        if EXIF_ORIGIN_TIMESTAMP in exif_tags:
-            cur_stamp = convert_and_clean_tag(exif_tags[EXIF_ORIGIN_TIMESTAMP])
+        if EXIF_ORIGINAL_TIMESTAMP in exif_tags:
+            cur_stamp = convert_and_clean_tag(exif_tags[EXIF_ORIGINAL_TIMESTAMP])
         if not cur_stamp:
             return None
 
-        if EXIF_ORIGIN_TIMESTAMP_OFFSET in exif_tags:
-            cur_offset = convert_and_clean_tag(exif_tags[EXIF_ORIGIN_TIMESTAMP_OFFSET])
+        if EXIF_ORIGINAL_TIMESTAMP_OFFSET in exif_tags:
+            cur_offset = convert_and_clean_tag(exif_tags[EXIF_ORIGINAL_TIMESTAMP_OFFSET])
         if not cur_offset and EXIF_TIMESTAMP_OFFSET in exif_tags:
             cur_offset = convert_and_clean_tag(exif_tags[EXIF_TIMESTAMP_OFFSET])
 

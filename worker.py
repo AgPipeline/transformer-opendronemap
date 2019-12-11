@@ -4,7 +4,7 @@
 import os
 import yaml
 
-# Override pylint to allow our trickery in setting up ODM
+# Override pylint to allow us to set the settings path before importing the rest of ODM
 # pylint: disable=wrong-import-position
 # Override the default settings with our settings
 from opendm import context
