@@ -2,6 +2,7 @@
 # A list of global configuration variables
 # Uncomment lines as needed to edit default settings.
 # Note this only works for settings with default values.
+# Information on these variables can be found at https://github.com/OpenDroneMap/ODM/wiki/Run-Time-Parameters
 
 #resize_to: 2048
 #start_with: 'resize'
