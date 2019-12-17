@@ -1,13 +1,9 @@
 ---
 # A list of global configuration variables
 # Uncomment lines as needed to edit default settings.
-# Note this only works for settings with default values. Some commands like --rerun <module>
-# or --force-ccd n will have to be set in the command line (if you need to)
+# Note this only works for settings with default values.
+# Information on these variables can be found at https://github.com/OpenDroneMap/ODM/wiki/Run-Time-Parameters
 
-# This line is really important to set up properly
-project_path: '/' #DO NOT CHANGE THIS OR DOCKER WILL NOT WORK. It should be '/'
-
-# The rest of the settings will default to the values set unless you uncomment and change them
 #resize_to: 2048
 #start_with: 'resize'
 #end_with: 'odm_orthophoto'
@@ -45,8 +41,8 @@ project_path: '/' #DO NOT CHANGE THIS OR DOCKER WILL NOT WORK. It should be '/'
 #texturing_tone_mapping: 'none'
 #gcp: !!null  # YAML tag for None
 #use_exif: False # Set to True if you have a GCP file (it auto-detects) and want to use EXIF
-dtm: True      # Use this tag to build a DTM (Digital Terrain Model
-dsm: True      # Use this tag to build a DSM (Digital Surface Model
+#dtm: True      # Use this tag to build a DTM (Digital Terrain Model
+#dsm: True      # Use this tag to build a DSM (Digital Surface Model
 #dem-gapfill-steps: 4
 #dem-resolution: 0.1
 #dem-maxangle:20
@@ -54,7 +50,7 @@ dsm: True      # Use this tag to build a DSM (Digital Surface Model
 #dem-approximate: False
 #dem-decimation: 1
 #dem-terrain-type: ComplexForest
-orthophoto_resolution: 2.0 # Pixels/meter
+#orthophoto_resolution: 2.0 # Pixels/meter
 #orthophoto_target_srs: !!null # Currently does nothing
 #orthophoto_no_tiled: False
 #orthophoto_compression: DEFLATE # Options are [JPEG, LZW, PACKBITS, DEFLATE, LZMA, NONE] Don't change unless you know what you are doing

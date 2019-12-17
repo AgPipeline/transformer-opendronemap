@@ -2,7 +2,7 @@
 """
 
 # The version number of the transformer
-TRANSFORMER_VERSION = '1.0'
+TRANSFORMER_VERSION = '2.0'
 
 # The transformer description
 TRANSFORMER_DESCRIPTION = 'Provides OpenDroneMap functionality'
@@ -25,5 +25,5 @@ AUTHOR_EMAIL = 'schnaufer@email.arizona.edu'
 # Contributors to this transformer
 CONTRUBUTORS = []
 
-# Reposity URI of where the source code lives
+# Repository URI of where the source code lives
 REPOSITORY = 'https://github.com/AgPipeline/transformer-opendronemap.git'

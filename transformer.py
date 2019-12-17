@@ -1,23 +1,15 @@
 """OpenDroneMap transformer
 """
 
-import argparse
 import os
 import logging
+import subprocess
 import tempfile
-import yaml
-
-from opendm import config
-
-from stages.odm_app import ODMApp
-
-import transformer_class
-
-# Forbidden OpenDroneMap setting overrides when using custom configuration
-NO_OVERRIDE_SETTINGS = ["project_path"]
+import time
+import datetime
 
 # Known image file extensions
-KNOWN_IMAGE_FILE_EXTS = ['tif', 'tiff', 'jpg']
+KNOWN_IMAGE_FILE_EXTS = ['.tif', '.tiff', '.jpg']
 
 # Paths and files available after processing
 RESULT_FILES = {
@@ -33,7 +25,10 @@ RESULT_FILES = {
         {'name': 'odm_georeferenced_model.boundary.json', 'type': 'shapefile'},
     ],
     'mve': {'name': 'mve_dense_point_cloud.ply', 'type': 'pointcloud'},
-    # TODO: Digital Elevation Model (dem) file(s)
+    'odm_dem': [
+        {'name': 'dsm.tif', 'type': 'dsm'},
+        {'name': 'dtm.tif', 'type': 'dtm'},
+    ]
 }
 
 class __internal__():
@@ -44,7 +39,7 @@ class __internal__():
         """
 
     @staticmethod
-    def check_for_image_file(path: str) -> bool:
+    def check_for_image_file(path):
         """Checks the specified path for image files. If a folder is specified,
            it's only searched to a depth of 1 (immediately inside of the folder)
         Arguments:
@@ -56,9 +51,11 @@ class __internal__():
         """
         # Iterate over a folder
         if os.path.isdir(path):
+            logging.debug("Checking folder")
             for one_path in os.listdir(path):
                 if not os.path.isdir(one_path):
-                    if os.path.splitext(path)[1].lower() in KNOWN_IMAGE_FILE_EXTS:
+                    logging.debug("Checking file in folder (%s): %s", os.path.splitext(one_path)[1].lower(), one_path)
+                    if os.path.splitext(one_path)[1].lower() in KNOWN_IMAGE_FILE_EXTS:
                         return True
         else:
             if os.path.splitext(path)[1].lower() in KNOWN_IMAGE_FILE_EXTS:
@@ -67,32 +64,7 @@ class __internal__():
         return False
 
     @staticmethod
-    def get_merge_options(path: str) -> dict:
-        """Merges the standard ODM settings with any overrides
-        Arguments:
-            path: optional file path to settings overrides
-        Return:
-            Returns the settings with any overrides
-        """
-        args = config.config()
-
-        # Load any overrides we might have
-        if path:
-            new_settings = None
-            with open(path) as in_file:
-                new_settings = yaml.safe_load(in_file)
-
-            if new_settings:
-                for name in new_settings:
-                    if name not in NO_OVERRIDE_SETTINGS:
-                        logging.debug("Configuration: overriding %s to new value '%s'", name, new_settings[name])
-                        setattr(args, name, new_settings[name])
-                    else:
-                        logging.warning("Skipping disallowed configuration value for %s", name)
-        return args
-
-    @staticmethod
-    def prepare_project_folder(files: list, default_folder: str) -> str:
+    def prepare_project_folder(files, default_folder):
         """Prepares the project folder
         Arguments:
             files: the list of files and folders to prepare
@@ -101,18 +73,98 @@ class __internal__():
              The path to the project folder
         """
         # Create a temporary folder and link the images to it
-        working_folder = tempfile.mkstemp(prefix="odm", dir=default_folder)
+        working_folder = tempfile.mkdtemp(prefix="odm", dir=default_folder)
         logging.debug("Creating project folder at '%s'", working_folder)
+        images_folder = os.path.join(working_folder, 'images')
+        if not os.path.exists(images_folder):
+            os.mkdir(images_folder)
+        logging.debug("Creating images folder at '%s'", images_folder)
+
+        # Get the list of files to process
+        file_list = []
         for one_file in files:
+            if os.path.isdir(one_file):
+                for file_name in os.listdir(one_file):
+                    if not os.path.isdir(file_name) and __internal__.check_for_image_file(file_name):
+                        file_list.append(os.path.join(one_file, file_name))
+            elif __internal__.check_for_image_file(one_file):
+                file_list.append(one_file)
+
+        logging.debug("Found files: %s", str(file_list))
+        for one_file in file_list:
             filename = os.path.basename(one_file)
             logging.debug("Linking file to working folder: '%s' ('%s')", filename, one_file)
-            ln_name = os.path.join(working_folder, filename)
+            ln_name = os.path.join(images_folder, filename)
+            logging.debug("symlink: '%s' to '%s'", one_file, ln_name)
             os.symlink(one_file, ln_name)
 
         return working_folder
 
+    @staticmethod
+    def consume_proc_output(proc):
+        """Consumes output from the specified process
+        Arguments:
+            proc: the process to read from
+        Notes:
+            Assumes the process was started with stdout being piped
+        """
+        try:
+            while True:
+                line = proc.stdout.readline()
+                if line:
+                    logging.debug(line.rstrip('\n'))
+                else:
+                    break
+        except Exception as ex:
+            logging.debug("Ignoring exception while waiting: %s", str(ex))
 
-def add_parameters(parser: argparse.ArgumentParser) -> None:
+    @staticmethod
+    def run_stitch(project_path, override_path=None):
+        """Runs open drone map through another script (allows us to control command line parameters and
+           other ODM expected dependencies
+        Arguments:
+            project_path: the path of the project folder
+            override_path: optional path to ODM override file
+        """
+        logging.debug('OpenDroneMap app beginning - %s', datetime.datetime.now().isoformat())
+        my_env = os.environ.copy()
+
+        # Set environment variables
+        my_env["ODM_PROJECT"] = project_path
+        if override_path:
+            logging.debug("Override settings file at: %s", override_path)
+            my_env["ODM_SETTINGS"] = override_path
+
+        # Build up path to ODM working script
+        my_path = os.path.dirname(os.path.realpath(__file__))
+        if not my_path:
+            my_path = "."
+        script_path = os.path.join(my_path, "worker.py")
+
+        # Start the process
+        logging.info("Starting ODM script at: %s", script_path)
+        proc = subprocess.Popen([script_path, "code"], bufsize=-1, env=my_env,
+                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+        # Wait for the script to finish
+        return_value = -1
+        if proc:
+            # Loop here processing the output until the proc finishes
+            logging.info("Waiting for process to finish")
+            while proc.returncode is None:
+                if proc.stdout is not None:
+                    __internal__.consume_proc_output(proc)
+                    proc.poll()
+
+                # Sleep and try again for process to complete
+                time.sleep(1)
+            logging.debug("Return code: %s", str(proc.returncode))
+            return_value = proc.returncode
+
+        logging.debug('OpenDroneMap app finished - %s', datetime.datetime.now().isoformat())
+        return return_value
+
+def add_parameters(parser):
     """Adds parameters
     Arguments:
         parser: instance of argparse.ArgumentParser
@@ -123,7 +175,7 @@ def add_parameters(parser: argparse.ArgumentParser) -> None:
                     ("\n" + parser.epilog) if parser.epilog else ""
 
 
-def check_continue(transformer: transformer_class.Transformer, check_md: dict, transformer_md: dict, full_md: dict) -> tuple:
+def check_continue(transformer, check_md, transformer_md, full_md):
     """Checks if conditions are right for continuing processing
     Arguments:
         transformer: instance of transformer class
@@ -142,13 +194,15 @@ def check_continue(transformer: transformer_class.Transformer, check_md: dict, t
 
     # Check that there's at least one image file in the list of files
     for one_file in check_md['list_files']():
+        logging.debug("Checking if image file: %s", one_file)
         if __internal__.check_for_image_file(one_file):
-            return tuple(0)
+            logging.debug("Found an image file")
+            return 0
 
     return (-1001, "Unable to find an image file in files to process. Accepting files types: '%s'" % ", ".join(KNOWN_IMAGE_FILE_EXTS))
 
 
-def perform_process(transformer: transformer_class.Transformer, check_md: dict, transformer_md: dict, full_md: dict) -> dict:
+def perform_process(transformer, check_md, transformer_md, full_md):
     """Performs the processing of the data
     Arguments:
         transformer: instance of transformer class
@@ -159,20 +213,17 @@ def perform_process(transformer: transformer_class.Transformer, check_md: dict, 
         Returns a dictionary with the results of processing
     """
     # pylint: disable=unused-argument
-    # Get our OpenDroneMap parameters merged with any overrides
-    odm_config = __internal__.get_merge_options(transformer.args.odm_overrides)
-
     # Create a temporary project folder and link all available images to that folder
-    odm_config.project_path = __internal__.prepare_project_folder(check_md['list_files'](), check_md['working_folder'])
+    project_path = __internal__.prepare_project_folder(check_md['list_files'](), check_md['working_folder'])
 
     # Process the images
-    app = ODMApp(args=odm_config)
-    app.execute()
+    logging.debug("Calling ODM with project path: %s", str(project_path))
+    stitch_code = __internal__.run_stitch(project_path, transformer.args.odm_overrides)
 
     # Provide a list of returned files
     files_md = []
     for result_folder, result_files in RESULT_FILES.items():
-        result_path = os.path.join(odm_config.project_path, result_folder)
+        result_path = os.path.join(project_path, result_folder)
         if isinstance(result_files, dict):
             result_files = [result_files]
         for one_file in result_files:
@@ -184,5 +235,5 @@ def perform_process(transformer: transformer_class.Transformer, check_md: dict, 
                 })
 
     return {'files': files_md,
-            'code': 0
+            'code': stitch_code
             }
