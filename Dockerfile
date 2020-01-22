@@ -35,3 +35,5 @@ USER extractor
 ENTRYPOINT ["/home/extractor/entrypoint.py"]
 
 COPY *.py settings.yaml /home/extractor/
+
+ENV PYTHONPATH="${PYTHONPATH}:/code"

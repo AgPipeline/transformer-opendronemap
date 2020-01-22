@@ -165,12 +165,12 @@ class __internal__():
             logging.debug("transformer module doesn't have a function named 'check_continue'")
 
         # Retrieve additional files if indicated by return code from the check
-        if not 'error' in result and 'code' in result and result['code'] == 0:
+        if 'error' not in result and 'code' in result and result['code'] == 0:
             # TODO: Fetch additional data for processing
             pass
 
         # Next make the call to perform the processing
-        if not 'error' in result:
+        if 'error' not in result:
             if hasattr(transformer, 'perform_process'):
                 result = transformer.perform_process(transformer_instance, **transformer_params)
             else:
