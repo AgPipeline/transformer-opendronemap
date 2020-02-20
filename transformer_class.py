@@ -3,6 +3,7 @@
 
 import datetime
 import logging
+import os
 import piexif
 
 import configuration
@@ -127,24 +128,31 @@ class Transformer():
         """
         return ['tif', 'tiff', 'jpg']
 
-    # pylint: disable=no-self-use
     def add_parameters(self, parser):
         """Adds processing parameters to existing parameters
         Arguments:
             parser: instance of argparse
         """
+        # pylint: disable=no-self-use
+        parser.add_argument('--logging', '-l', nargs='?', default=os.getenv("LOGGING"),
+                            help='file or url or logging configuration (default=None)')
+
         parser.epilog = configuration.TRANSFORMER_NAME + ' version ' + configuration.TRANSFORMER_VERSION + \
                         ' author ' + configuration.AUTHOR_NAME + ' ' + configuration.AUTHOR_EMAIL
 
-    def get_transformer_params(self, args, metadata):
+    def get_transformer_params(self, args, metadata_list):
         """Returns a parameter list for processing data
         Arguments:
             args: result of calling argparse.parse_args
-            metadata: the loaded metadata
+            metadata_list: the loaded metadata
         """
+        # Setup logging
+        pyc_setup_logging(args.logging)
+
         self.args = args
 
         # Determine if we're using JSONLD
+        metadata = metadata_list[0]
         if 'content' in metadata:
             parse_md = metadata['content']
         else:
