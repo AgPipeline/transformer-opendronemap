@@ -4,6 +4,7 @@
 import datetime
 import logging
 import os
+from pyclowder.utils import setup_logging as pyc_setup_logging
 import piexif
 
 import configuration
@@ -20,6 +21,26 @@ class __internal__():
     def __init__(self):
         """Perform class level initialization
         """
+
+    @staticmethod
+    def fromisoformat(timestamp):
+        """Converts YYYY-MM-DDTHH:MI:SS, YYYY-MM-DDTHH:MI:SS.mmmm with or without a timezone offset to a datetime object
+        Arguments:
+            timestamp(str): the timestamp to convert
+        """
+        try:
+            base_format = '%Y-%m-%dT%H:%M:%S'
+            if '.' in timestamp:
+                base_format = base_format + '.%f'
+            if '+' in timestamp or '-' in timestamp:
+                base_format = base_format + '%z'
+
+            logging.info("Converting timestamp: '%s' %s", str(timestamp), base_format)
+            return datetime.strptime(timestamp, base_format)
+        except Exception as ex:
+            logging.error("Continuing after exception converting timestamp '%s': %s", str(timestamp), str(ex))
+
+        return None
 
     @staticmethod
     def exif_tags_to_timestamp(exif_tags):
@@ -73,10 +94,10 @@ class __internal__():
         # Format the string to a timestamp and return the result
         try:
             if not cur_offset:
-                cur_ts = datetime.datetime.fromisoformat(cur_stamp)
+                cur_ts = __internal__.fromisoformat(cur_stamp)
             else:
                 cur_offset = cur_offset.replace(":", "")
-                cur_ts = datetime.datetime.fromisoformat(cur_stamp + cur_offset)
+                cur_ts = __internal__.fromisoformat(cur_stamp + cur_offset)
         except Exception as ex:
             cur_ts = None
             logging.debug("Exception caught converting EXIF tag to timestamp: %s", str(ex))
@@ -93,7 +114,7 @@ class __internal__():
         Return:
             The earliest found timestamp
         """
-        first_stamp = datetime.datetime.fromisoformat(timestamp)
+        first_stamp = __internal__.fromisoformat(timestamp)
         try:
             tags_dict = piexif.load(file_path)
             if tags_dict and "Exif" in tags_dict:

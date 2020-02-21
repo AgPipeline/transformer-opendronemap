@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Base entry point for Agriculture Pipeline transformer
 """
 
