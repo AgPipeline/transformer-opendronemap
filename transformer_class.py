@@ -29,14 +29,20 @@ class __internal__():
             timestamp(str): the timestamp to convert
         """
         try:
-            base_format = '%Y-%m-%dT%H:%M:%S'
+            logging.debug("Checking for specific characters in timestamp")
+            if 'T' in timestamp:
+                base_format = '%Y-%m-%dT%H:%M:%S'
+            elif '-' in timestamp:
+                base_format = '%Y-%m-%d %H:%M:%S'
+            else:
+                base_format = '%Y:%m:%d %H:%M:%S'
             if '.' in timestamp:
                 base_format = base_format + '.%f'
-            if '+' in timestamp or '-' in timestamp:
+            if '+' in timestamp or (timestamp.rfind('-') > timestamp.rfind(':')):
                 base_format = base_format + '%z'
 
             logging.info("Converting timestamp: '%s' %s", str(timestamp), base_format)
-            return datetime.strptime(timestamp, base_format)
+            return datetime.datetime.strptime(timestamp, base_format)
         except Exception as ex:
             logging.error("Continuing after exception converting timestamp '%s': %s", str(timestamp), str(ex))
 
@@ -94,8 +100,10 @@ class __internal__():
         # Format the string to a timestamp and return the result
         try:
             if not cur_offset:
+                logging.debug("Converting EXIF timestamp without offset: '%s'", str(cur_stamp))
                 cur_ts = __internal__.fromisoformat(cur_stamp)
             else:
+                logging.debug("Converting EXIF timestamp and offset: '%s' '%s'", str(cur_stamp), str(cur_offset))
                 cur_offset = cur_offset.replace(":", "")
                 cur_ts = __internal__.fromisoformat(cur_stamp + cur_offset)
         except Exception as ex:
@@ -114,6 +122,7 @@ class __internal__():
         Return:
             The earliest found timestamp
         """
+        logging.debug("Getting first timestamp from timestamp and file: '%s' '%s'", str(timestamp), str(file_path))
         first_stamp = __internal__.fromisoformat(timestamp)
         try:
             tags_dict = piexif.load(file_path)
@@ -161,6 +170,24 @@ class Transformer():
         parser.epilog = configuration.TRANSFORMER_NAME + ' version ' + configuration.TRANSFORMER_VERSION + \
                         ' author ' + configuration.AUTHOR_NAME + ' ' + configuration.AUTHOR_EMAIL
 
+    def get_image_files(self, files_folders: list) -> list:
+        """Returns a list of image files from the passed in list. Performs a shallow folder check (1 deep)
+        Arguments:
+            files_folders: a list of files and folders to parse
+        Return:
+            Returns a list of image files
+        """
+        return_files = []
+        for one_path in files_folders:
+            if os.path.isdir(one_path):
+                for dir_path in os.listdir(one_path):
+                    if not os.path.isdir(dir_path):
+                        if os.path.splitext(dir_path)[1].lstrip('.').lower() in self.supported_image_file_exts:
+                            return_files.append(os.path.join(one_path, dir_path))
+            elif os.path.splitext(one_path)[1].lstrip('.').lower() in self.supported_image_file_exts:
+                return_files.append(one_path)
+        return return_files
+
     def get_transformer_params(self, args, metadata_list):
         """Returns a parameter list for processing data
         Arguments:
@@ -193,7 +220,10 @@ class Transformer():
         file_list = []
         working_timestamp = timestamp
         if args.file_list:
-            for one_file in args.file_list:
+            logging.debug("Looking for images in following list: %s", str(args.file_list))
+            check_list = self.get_image_files(args.file_list)
+            logging.debug("Found the following files: %s", str(check_list))
+            for one_file in check_list:
                 # Filter out arguments that are obviously not files
                 if not one_file.startswith('-'):
                     file_list.append(one_file)
