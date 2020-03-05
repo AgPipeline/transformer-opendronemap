@@ -28,6 +28,8 @@ class __internal__():
         Arguments:
             timestamp(str): the timestamp to convert
         """
+        if not timestamp:
+            return None
         try:
             logging.debug("Checking for specific characters in timestamp")
             if 'T' in timestamp:
@@ -208,6 +210,7 @@ class Transformer():
 
         # Get the season, experiment, etc information
         timestamp, season_name, experiment_name = None, None, None
+        logging.debug("Using the following experimental metadata: %s", str(parse_md))
         if 'observationTimeStamp' in parse_md:
             timestamp = parse_md['observationTimeStamp']
         if 'season' in parse_md:
