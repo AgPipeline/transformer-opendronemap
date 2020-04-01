@@ -1,2 +1,4 @@
+enum34
 piexif
-pika
+pika==1.0.0
+pyclowder

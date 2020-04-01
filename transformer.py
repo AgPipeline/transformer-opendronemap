@@ -112,11 +112,15 @@ class __internal__():
             while True:
                 line = proc.stdout.readline()
                 if line:
+                    if isinstance(line, bytes):
+                        line = line.decode('UTF-8').strip()
                     logging.debug(line.rstrip('\n'))
                 else:
                     break
         except Exception as ex:
             logging.debug("Ignoring exception while waiting: %s", str(ex))
+            if logging.getLogger().level in [logging.INFO, logging.DEBUG]:
+                logging.exception(ex)
 
     @staticmethod
     def run_stitch(project_path, override_path=None):
@@ -234,6 +238,6 @@ def perform_process(transformer, check_md, transformer_md, full_md):
                     'key': one_file['type']
                 })
 
-    return {'files': files_md,
+    return {'file': files_md,
             'code': stitch_code
             }
