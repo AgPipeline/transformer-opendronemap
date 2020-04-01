@@ -24,10 +24,10 @@ RUN [ -s /home/extractor/packages.txt ] && \
 
 RUN [ -s /home/extractor/requirements.txt ] && \
     (echo 'Install python modules' && \
-    python -m pip install -U --no-cache-dir pip && \
-    python -m pip install --no-cache-dir setuptools && \
-     python -m pip install --no-cache-dir -r /home/extractor/requirements.txt && \
-     rm /home/extractor/requirements.txt) || \
+    python3 -m pip install -U --no-cache-dir pip && \
+    python3 -m pip install --no-cache-dir setuptools && \
+    python3 -m pip install --no-cache-dir -r /home/extractor/requirements.txt && \
+    rm /home/extractor/requirements.txt) || \
     (echo 'No python modules to install' && \
      rm /home/extractor/requirements.txt)
 

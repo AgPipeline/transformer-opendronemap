@@ -3,6 +3,8 @@
 
 import datetime
 import logging
+import os
+from pyclowder.utils import setup_logging as pyc_setup_logging
 import piexif
 
 import configuration
@@ -19,6 +21,34 @@ class __internal__():
     def __init__(self):
         """Perform class level initialization
         """
+
+    @staticmethod
+    def fromisoformat(timestamp):
+        """Converts YYYY-MM-DDTHH:MI:SS, YYYY-MM-DDTHH:MI:SS.mmmm with or without a timezone offset to a datetime object
+        Arguments:
+            timestamp(str): the timestamp to convert
+        """
+        if not timestamp:
+            return None
+        try:
+            logging.debug("Checking for specific characters in timestamp")
+            if 'T' in timestamp:
+                base_format = '%Y-%m-%dT%H:%M:%S'
+            elif '-' in timestamp:
+                base_format = '%Y-%m-%d %H:%M:%S'
+            else:
+                base_format = '%Y:%m:%d %H:%M:%S'
+            if '.' in timestamp:
+                base_format = base_format + '.%f'
+            if '+' in timestamp or (timestamp.rfind('-') > timestamp.rfind(':')):
+                base_format = base_format + '%z'
+
+            logging.info("Converting timestamp: '%s' %s", str(timestamp), base_format)
+            return datetime.datetime.strptime(timestamp, base_format)
+        except Exception as ex:
+            logging.error("Continuing after exception converting timestamp '%s': %s", str(timestamp), str(ex))
+
+        return None
 
     @staticmethod
     def exif_tags_to_timestamp(exif_tags):
@@ -72,10 +102,12 @@ class __internal__():
         # Format the string to a timestamp and return the result
         try:
             if not cur_offset:
-                cur_ts = datetime.datetime.fromisoformat(cur_stamp)
+                logging.debug("Converting EXIF timestamp without offset: '%s'", str(cur_stamp))
+                cur_ts = __internal__.fromisoformat(cur_stamp)
             else:
+                logging.debug("Converting EXIF timestamp and offset: '%s' '%s'", str(cur_stamp), str(cur_offset))
                 cur_offset = cur_offset.replace(":", "")
-                cur_ts = datetime.datetime.fromisoformat(cur_stamp + cur_offset)
+                cur_ts = __internal__.fromisoformat(cur_stamp + cur_offset)
         except Exception as ex:
             cur_ts = None
             logging.debug("Exception caught converting EXIF tag to timestamp: %s", str(ex))
@@ -92,7 +124,8 @@ class __internal__():
         Return:
             The earliest found timestamp
         """
-        first_stamp = datetime.datetime.fromisoformat(timestamp)
+        logging.debug("Getting first timestamp from timestamp and file: '%s' '%s'", str(timestamp), str(file_path))
+        first_stamp = __internal__.fromisoformat(timestamp)
         try:
             tags_dict = piexif.load(file_path)
             if tags_dict and "Exif" in tags_dict:
@@ -127,24 +160,49 @@ class Transformer():
         """
         return ['tif', 'tiff', 'jpg']
 
-    # pylint: disable=no-self-use
     def add_parameters(self, parser):
         """Adds processing parameters to existing parameters
         Arguments:
             parser: instance of argparse
         """
+        # pylint: disable=no-self-use
+        parser.add_argument('--logging', '-l', nargs='?', default=os.getenv("LOGGING"),
+                            help='file or url or logging configuration (default=None)')
+
         parser.epilog = configuration.TRANSFORMER_NAME + ' version ' + configuration.TRANSFORMER_VERSION + \
                         ' author ' + configuration.AUTHOR_NAME + ' ' + configuration.AUTHOR_EMAIL
 
-    def get_transformer_params(self, args, metadata):
+    def get_image_files(self, files_folders: list) -> list:
+        """Returns a list of image files from the passed in list. Performs a shallow folder check (1 deep)
+        Arguments:
+            files_folders: a list of files and folders to parse
+        Return:
+            Returns a list of image files
+        """
+        return_files = []
+        for one_path in files_folders:
+            if os.path.isdir(one_path):
+                for dir_path in os.listdir(one_path):
+                    if not os.path.isdir(dir_path):
+                        if os.path.splitext(dir_path)[1].lstrip('.').lower() in self.supported_image_file_exts:
+                            return_files.append(os.path.join(one_path, dir_path))
+            elif os.path.splitext(one_path)[1].lstrip('.').lower() in self.supported_image_file_exts:
+                return_files.append(one_path)
+        return return_files
+
+    def get_transformer_params(self, args, metadata_list):
         """Returns a parameter list for processing data
         Arguments:
             args: result of calling argparse.parse_args
-            metadata: the loaded metadata
+            metadata_list: the loaded metadata
         """
+        # Setup logging
+        pyc_setup_logging(args.logging)
+
         self.args = args
 
         # Determine if we're using JSONLD
+        metadata = metadata_list[0]
         if 'content' in metadata:
             parse_md = metadata['content']
         else:
@@ -152,6 +210,7 @@ class Transformer():
 
         # Get the season, experiment, etc information
         timestamp, season_name, experiment_name = None, None, None
+        logging.debug("Using the following experimental metadata: %s", str(parse_md))
         if 'observationTimeStamp' in parse_md:
             timestamp = parse_md['observationTimeStamp']
         if 'season' in parse_md:
@@ -164,7 +223,10 @@ class Transformer():
         file_list = []
         working_timestamp = timestamp
         if args.file_list:
-            for one_file in args.file_list:
+            logging.debug("Looking for images in following list: %s", str(args.file_list))
+            check_list = self.get_image_files(args.file_list)
+            logging.debug("Found the following files: %s", str(check_list))
+            for one_file in check_list:
                 # Filter out arguments that are obviously not files
                 if not one_file.startswith('-'):
                     file_list.append(one_file)
