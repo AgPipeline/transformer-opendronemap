@@ -27,3 +27,7 @@ CONTRUBUTORS = []
 
 # Repository URI of where the source code lives
 REPOSITORY = 'https://github.com/AgPipeline/transformer-opendronemap.git'
+
+# Override flag for disabling the metadata file requirement.
+# Uncomment and set to False to override default behavior
+#METADATA_NEEDED = True
