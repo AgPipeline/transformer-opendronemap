@@ -137,6 +137,8 @@ class __internal__():
         """
         # If we have a variable defined, check the many ways of determining False
         if hasattr(configuration, "METADATA_NEEDED"):
+            # We disable this pylint check since we've performed an explicit check above
+            # pylint: disable=no-member
             if not configuration.METADATA_NEEDED:
                 return False
             if isinstance(configuration.METADATA_NEEDED, str):
