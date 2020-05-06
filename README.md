@@ -33,3 +33,9 @@ Note that the paths provided are relative to the running image (see the --mount 
 - `--working_space "/mnt"` specifies the folder to use as a workspace
 - `--metadata "/mnt//mnt/test/experiment.json"` contains the experiment metadata
 - `"/mnt/2018-10-21"` is the name of the folder containing images to process
+
+### Ground Control Point file support
+Ground control point files are supported by default when OpenDroneMap finds a file named `gcp_list.txt`.
+Either add this file to the folder containing the images, or specify on the command line, to make use of this feature.
+
+Refer to the OpenDroneMap GCP file information for how to structure the contents.
