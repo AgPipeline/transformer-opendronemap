@@ -160,6 +160,12 @@ class Transformer():
         """
         return ['tif', 'tiff', 'jpg']
 
+    @property
+    def supported_file_exts(self):
+        """Returns the list of supported file extension strings (in lower case)
+        """
+        return ['tif', 'tiff', 'jpg', 'txt']
+
     def add_parameters(self, parser):
         """Adds processing parameters to existing parameters
         Arguments:
@@ -172,8 +178,8 @@ class Transformer():
         parser.epilog = configuration.TRANSFORMER_NAME + ' version ' + configuration.TRANSFORMER_VERSION + \
                         ' author ' + configuration.AUTHOR_NAME + ' ' + configuration.AUTHOR_EMAIL
 
-    def get_image_files(self, files_folders: list) -> list:
-        """Returns a list of image files from the passed in list. Performs a shallow folder check (1 deep)
+    def get_acceptable_files(self, files_folders: list) -> list:
+        """Returns a list of files from the passed in list. Performs a shallow folder check (1 deep)
         Arguments:
             files_folders: a list of files and folders to parse
         Return:
@@ -184,9 +190,9 @@ class Transformer():
             if os.path.isdir(one_path):
                 for dir_path in os.listdir(one_path):
                     if not os.path.isdir(dir_path):
-                        if os.path.splitext(dir_path)[1].lstrip('.').lower() in self.supported_image_file_exts:
+                        if os.path.splitext(dir_path)[1].lstrip('.').lower() in self.supported_file_exts:
                             return_files.append(os.path.join(one_path, dir_path))
-            elif os.path.splitext(one_path)[1].lstrip('.').lower() in self.supported_image_file_exts:
+            elif os.path.splitext(one_path)[1].lstrip('.').lower() in self.supported_file_exts:
                 return_files.append(one_path)
         return return_files
 
@@ -223,8 +229,8 @@ class Transformer():
         file_list = []
         working_timestamp = timestamp
         if args.file_list:
-            logging.debug("Looking for images in following list: %s", str(args.file_list))
-            check_list = self.get_image_files(args.file_list)
+            logging.debug("Looking for files in following list: %s", str(args.file_list))
+            check_list = self.get_acceptable_files(args.file_list)
             logging.debug("Found the following files: %s", str(check_list))
             for one_file in check_list:
                 # Filter out arguments that are obviously not files

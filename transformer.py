@@ -11,6 +11,9 @@ import datetime
 # Known image file extensions
 KNOWN_IMAGE_FILE_EXTS = ['.tif', '.tiff', '.jpg']
 
+# Known additional acceptable files
+KNOWN_GCP_FILES = ['gcp_list.txt']
+
 # Paths and files available after processing
 RESULT_FILES = {
     'odm_orthophoto': {'name': 'odm_orthophoto.tif', 'type': 'rgb'},
@@ -64,6 +67,19 @@ class __internal__():
         return False
 
     @staticmethod
+    def check_gcp_file(path):
+        """Checks if the path is acceptable
+        Arguments:
+            path: the path to check
+        Return:
+            Returns True if the file is acceptable
+        """
+        logging.debug("Checking if %s is in %s", os.path.basename(path), str(KNOWN_GCP_FILES))
+        if os.path.basename(path) in KNOWN_GCP_FILES:
+            return True
+        return False
+
+    @staticmethod
     def prepare_project_folder(files, default_folder):
         """Prepares the project folder
         Arguments:
@@ -82,21 +98,35 @@ class __internal__():
 
         # Get the list of files to process
         file_list = []
+        gcp_file = None
         for one_file in files:
             if os.path.isdir(one_file):
                 for file_name in os.listdir(one_file):
-                    if not os.path.isdir(file_name) and __internal__.check_for_image_file(file_name):
-                        file_list.append(os.path.join(one_file, file_name))
+                    if not os.path.isdir(file_name):
+                        if __internal__.check_for_image_file(file_name):
+                            file_list.append(os.path.join(one_file, file_name))
+                        elif __internal__.check_gcp_file(file_name):
+                            gcp_file = os.path.join(one_file, file_name)
             elif __internal__.check_for_image_file(one_file):
                 file_list.append(one_file)
+            elif __internal__.check_gcp_file(one_file):
+                gcp_file = one_file
 
-        logging.debug("Found files: %s", str(file_list))
+        logging.debug("Found image files: %s", str(file_list))
         for one_file in file_list:
             filename = os.path.basename(one_file)
-            logging.debug("Linking file to working folder: '%s' ('%s')", filename, one_file)
+            logging.debug("Linking file to image folder: '%s' ('%s')", filename, one_file)
             ln_name = os.path.join(images_folder, filename)
             logging.debug("symlink: '%s' to '%s'", one_file, ln_name)
             os.symlink(one_file, ln_name)
+
+        logging.debug("Handling GCP file: %s", str(gcp_file))
+        if gcp_file:
+            filename = os.path.basename(gcp_file)
+            logging.debug("Linking file to working folder: '%s' ('%s')", filename, gcp_file)
+            ln_name = os.path.join(working_folder, filename)
+            logging.debug("symlink: '%s' to '%s'", gcp_file, ln_name)
+            os.symlink(gcp_file, ln_name)
 
         return working_folder
 
