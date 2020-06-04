@@ -5,7 +5,6 @@ import datetime
 import json
 import logging
 import os
-#from pyclowder.utils import setup_logging as pyc_setup_logging
 import tempfile
 import piexif
 import requests

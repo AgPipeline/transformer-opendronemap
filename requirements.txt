@@ -3,4 +3,3 @@ requests
 enum34
 piexif
 pika==1.0.0
-pyclowder
