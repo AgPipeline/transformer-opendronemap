@@ -2,12 +2,16 @@
 """
 
 import datetime
+import json
 import logging
 import os
-from pyclowder.utils import setup_logging as pyc_setup_logging
+#from pyclowder.utils import setup_logging as pyc_setup_logging
 import piexif
+import requests
+import tempfile
 
 import configuration
+import yaml
 
 # EXIF tags to look for, see https://www.exiv2.org/tags.html
 EXIF_ORIGINAL_TIMESTAMP = 36867         # Capture timestamp
@@ -203,7 +207,40 @@ class Transformer():
             metadata_list: the loaded metadata
         """
         # Setup logging
-        pyc_setup_logging(args.logging)
+
+        if args.logging:
+            temp_file = None
+            if args.logging.startswith("http://") or args.logging.startswith("https://"):
+                r = requests.get(args.logging)
+                r.raise_for_status()
+                (temp_file, abs_path) = tempfile.mkstemp()
+                with os.fdopen(temp_file, "wb") as tmp:
+                    for chunk in r.iter_content(chunk_size=1024):
+                        tmp.write(chunk)
+                args.logging = temp_file
+
+            if os.path.isfile(args.logging):
+                if args.logging.endswith('.yml'):
+                    with open(args.logging, 'r') as configfile:
+                        config = yaml.safe_load(configfile)
+                        logging.config.dictConfig(config)
+                elif args.logging.endswith('.json'):
+                    with open(args.logging, 'r') as configfile:
+                        config = json.load(configfile)
+                        logging.config.dictConfig(config)
+                else:
+                    logging.config.fileConfig(args.logging)
+            else:
+                config = json.load(args.logging)
+                logging.config.dictConfig(config)
+
+            if temp_file:
+                os.remove(temp_file)
+        else:
+            logging.basicConfig(format='%(asctime)-15s [%(threadName)-15s] %(levelname)-7s :'
+                                       ' %(name)s - %(message)s',
+                                level=logging.INFO)
+            logging.getLogger('requests.packages.urllib3.connectionpool').setLevel(logging.WARN)
 
         self.args = args
 
