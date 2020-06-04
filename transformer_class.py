@@ -6,12 +6,12 @@ import json
 import logging
 import os
 #from pyclowder.utils import setup_logging as pyc_setup_logging
+import tempfile
 import piexif
 import requests
-import tempfile
 
-import configuration
 import yaml
+import configuration
 
 # EXIF tags to look for, see https://www.exiv2.org/tags.html
 EXIF_ORIGINAL_TIMESTAMP = 36867         # Capture timestamp
@@ -211,11 +211,11 @@ class Transformer():
         if args.logging:
             temp_file = None
             if args.logging.startswith("http://") or args.logging.startswith("https://"):
-                r = requests.get(args.logging)
-                r.raise_for_status()
-                (temp_file, abs_path) = tempfile.mkstemp()
+                request_current = requests.get(args.logging)
+                request_current.raise_for_status()
+                (temp_file) = tempfile.mkstemp()[0]
                 with os.fdopen(temp_file, "wb") as tmp:
-                    for chunk in r.iter_content(chunk_size=1024):
+                    for chunk in request_current.iter_content(chunk_size=1024):
                         tmp.write(chunk)
                 args.logging = temp_file
 
