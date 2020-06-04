@@ -348,8 +348,7 @@ def add_parameters(parser, transformer_instance):
 
     parser.add_argument('--metadata', type=str, action='append', help='The path to the source metadata')
 
-    parser.add_argument('--working_space', type=str, help='the folder to use use as a workspace and ' +
-                                                          'for storing results')
+    parser.add_argument('--working_space', type=str, help='the folder to use use as a workspace and for storing results')
 
     # Let the transformer class add parameters
     if hasattr(transformer_instance, 'add_parameters'):
