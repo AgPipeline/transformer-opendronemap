@@ -14,9 +14,11 @@ import transformer_class
 import configuration
 import transformer
 
+
 class __internal__():
     """Class for functions intended for internal use only for this file
     """
+
     def __init__(self):
         """Performs initialization of class instance
         """
@@ -327,6 +329,7 @@ class __internal__():
 
         return result
 
+
 def add_parameters(parser, transformer_instance):
     """Function to prepare and execute work unit
     Arguments:
@@ -346,7 +349,7 @@ def add_parameters(parser, transformer_instance):
     parser.add_argument('--metadata', type=str, action='append', help='The path to the source metadata')
 
     parser.add_argument('--working_space', type=str, help='the folder to use use as a workspace and ' +
-                        'for storing results')
+                                                          'for storing results')
 
     # Let the transformer class add parameters
     if hasattr(transformer_instance, 'add_parameters'):
@@ -358,6 +361,7 @@ def add_parameters(parser, transformer_instance):
 
     # Assume the rest of the arguments are the files
     parser.add_argument('file_list', nargs=argparse.REMAINDER, help='additional files for transformer')
+
 
 def do_work(parser, **kwargs):
     """Function to prepare and execute work unit
@@ -396,6 +400,7 @@ def do_work(parser, **kwargs):
 
     __internal__.handle_result(result, args.result, result_path)
     return result
+
 
 if __name__ == "__main__":
     try:

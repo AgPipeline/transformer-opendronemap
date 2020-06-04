@@ -4,10 +4,12 @@ on:
     branches:
       - master
       - develop
+      - remove_dependencies
   pull_request:
     branches:
       - master
       - develop
+      - remove_dependencies
     tags:
       - v*
 
@@ -36,7 +38,7 @@ jobs:
         id: find-python-files
       - name: Install system requirements from source
         shell: bash
-        run: '[ -s "packages.txt" ] && (cat packages.txt | xargs apt-get install -y --no-install-recommends) || (echo "No addtional packages to install")'
+        run: '[ -s "packages.txt" ] && (cat packages.txt | sudo xargs apt-get install -y --no-install-recommends) || (echo "No addtional packages to install")'
         id: install-system-reqs
       - name: Install Python requirements from source
         shell: bash
