@@ -89,7 +89,7 @@ class __internal__():
              The path to the project folder
         """
         # Create a temporary folder and link the images to it
-        working_folder = tempfile.mkdtemp(prefix="odm", dir=default_folder)
+        working_folder = default_folder
         logging.debug("Creating project folder at '%s'", working_folder)
         images_folder = os.path.join(working_folder, 'images')
         if not os.path.exists(images_folder):
