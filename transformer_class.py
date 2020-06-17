@@ -3,7 +3,7 @@
 
 import os
 
-from agpypeline import transformer_class
+from agpypeline import transformer_class as transform
 
 # EXIF tags to look for, see https://www.exiv2.org/tags.html
 EXIF_ORIGINAL_TIMESTAMP = 36867         # Capture timestamp
@@ -11,7 +11,7 @@ EXIF_TIMESTAMP_OFFSET = 36881           # Timestamp UTC offset (general)
 EXIF_ORIGINAL_TIMESTAMP_OFFSET = 36881  # Capture timestamp UTC offset
 
 
-class __internal__():
+class __internal__:
     """Class containing functions for this file only
     """
     def __init__(self):
@@ -28,7 +28,7 @@ class __internal__():
             Returns the origin timestamp when found. The return timestamp is adjusted for UTF if
             an offset is found. None is returned if a valid timestamp isn't found.
         """
-        return transformer_class.__internal__.exif_tags_to_timestamp(exif_tags)
+        return transform.__internal__.exif_tags_to_timestamp(exif_tags)
 
     @staticmethod
     def get_first_timestamp(file_path, timestamp):
@@ -40,10 +40,10 @@ class __internal__():
         Return:
             The earliest found timestamp
         """
-        return transformer_class.__internal__.get_first_timestamp(file_path, timestamp)
+        return transform.__internal__.get_first_timestamp(file_path, timestamp)
 
 
-class Transformer():
+class Transformer:
     """Generic class for supporting transformers
     """
     # pylint: disable=unused-argument
@@ -72,7 +72,7 @@ class Transformer():
         Arguments:
             parser: instance of argparse
         """
-        Transformer.add_parameters(self, parser)
+        transform.Transformer.add_parameters(self, parser)
 
     def get_acceptable_files(self, files_folders: list) -> list:
         """Returns a list of files from the passed in list. Performs a shallow folder check (1 deep)
