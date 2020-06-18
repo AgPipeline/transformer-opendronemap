@@ -1,6 +1,6 @@
 agpypeline==0.0.2
 enum34
 piexif
-pika==1.0.0
+pika==1.1.0
 PyYAML
 requests

@@ -4,6 +4,7 @@ on:
     branches:
       - master
       - develop
+      - remove_dependencies
   pull_request:
     branches:
       - master
