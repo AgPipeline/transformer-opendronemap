@@ -15,7 +15,7 @@ import configuration
 import transformer
 
 
-class __internal__():
+class __internal__:
     """Class for functions intended for internal use only for this file
     """
 
