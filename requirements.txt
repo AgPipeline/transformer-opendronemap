@@ -1,4 +1,4 @@
-agpypeline==0.0.6
+agpypeline==0.0.8
 enum34
 piexif
 pika==1.1.0

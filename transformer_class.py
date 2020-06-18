@@ -72,7 +72,7 @@ class Transformer:
         Arguments:
             parser: instance of argparse
         """
-        tc.TransformerClass.add_parameters(self, parser)
+        tc.Transformer.add_parameters(self, parser)
 
     def get_acceptable_files(self, files_folders: list) -> list:
         """Returns a list of files from the passed in list. Performs a shallow folder check (1 deep)
