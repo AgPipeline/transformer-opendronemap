@@ -4,10 +4,12 @@ on:
     branches:
       - master
       - develop
+      - remove_dependencies
   pull_request:
     branches:
       - master
       - develop
+      - remove_dependencies
     tags:
       - v*
 

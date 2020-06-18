@@ -59,7 +59,7 @@ class Transformer:
     def supported_image_file_exts(self):
         """Returns the list of supported image file extension strings (in lower case)
         """
-        return Transformer.supported_file_exts
+        return ['tif', 'tiff', 'jpg']
 
     @property
     def supported_file_exts(self):
