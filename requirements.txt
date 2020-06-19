@@ -1,4 +1,6 @@
+agpypeline==0.0.10
 enum34
 piexif
-pika==1.0.0
-pyclowder
+pika==1.1.0
+PyYAML
+requests

@@ -1,5 +1,5 @@
 # Version 1.0 template-transformer-simple 
-FROM opendronemap/odm:0.9.1
+FROM opendronemap/odm:0.7.0
 LABEL maintainer="Chris Schnaufer <schnaufer@email.arizona.edu>"
 
 RUN useradd -u 49044 extractor \
@@ -30,6 +30,14 @@ RUN [ -s /home/extractor/requirements.txt ] && \
     rm /home/extractor/requirements.txt) || \
     (echo 'No python modules to install' && \
      rm /home/extractor/requirements.txt)
+
+RUN (echo "installing osgeo dependencies" && \
+    apt-get update && \
+    apt-get install -y python3-gdal gdal-bin libgdal-dev gcc g++ python3.5-dev && \
+    python3 -m pip install --no-cache-dir pygdal==2.2.2.* && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*)
 
 USER extractor
 ENTRYPOINT ["/home/extractor/entrypoint.py"]
