@@ -31,13 +31,10 @@ RUN [ -s /home/extractor/requirements.txt ] && \
     (echo 'No python modules to install' && \
      rm /home/extractor/requirements.txt)
 
-RUN (echo "installing sudo" && \
-    apt-get update && \
-    apt-get -y install sudo)
-
 RUN (echo "installing osgeo dependencies" && \
-    sudo apt-get install -y python3-gdal gdal-bin libgdal-dev gcc g++ python3.5-dev && \
-    sudo python3 -m pip install --no-cache-dir pygdal==2.2.2.*)
+    apt-get update && \
+    apt-get install -y python3-gdal gdal-bin libgdal-dev gcc g++ python3.5-dev && \
+    python3 -m pip install --no-cache-dir pygdal==2.2.2.*)
 
 USER extractor
 ENTRYPOINT ["/home/extractor/entrypoint.py"]
