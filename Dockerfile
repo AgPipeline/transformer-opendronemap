@@ -34,7 +34,10 @@ RUN [ -s /home/extractor/requirements.txt ] && \
 RUN (echo "installing osgeo dependencies" && \
     apt-get update && \
     apt-get install -y python3-gdal gdal-bin libgdal-dev gcc g++ python3.5-dev && \
-    python3 -m pip install --no-cache-dir pygdal==2.2.2.*)
+    python3 -m pip install --no-cache-dir pygdal==2.2.2.* && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*)
 
 USER extractor
 ENTRYPOINT ["/home/extractor/entrypoint.py"]
