@@ -1,33 +1,40 @@
 """Contains transformer configuration information
 """
+from agpypeline.configuration import Configuration
 
-# The version number of the transformer
-TRANSFORMER_VERSION = '2.0'
 
-# The transformer description
-TRANSFORMER_DESCRIPTION = 'Provides OpenDroneMap functionality'
+class ConfigurationOdm(Configuration):
+    """Configuration information for Open Drone Map"""
+    # Silence this error until we have public methods
+    # pylint: disable=too-few-public-methods
 
-# Short name of the transformer
-TRANSFORMER_NAME = 'opendronemap'
+    # The version number of the transformer
+    transformer_version = '2.0'
 
-# The sensor associated with the transformer
-TRANSFORMER_SENSOR = 'rgb'
+    # The transformer description
+    transformer_description = 'Provides OpenDroneMap functionality'
 
-# The transformer type (eg: 'rgbmask', 'plotclipper')
-TRANSFORMER_TYPE = 'opendronemap'
+    # Short name of the transformer
+    transformer_name = 'opendronemap'
 
-# The name of the author of the extractor
-AUTHOR_NAME = 'Chris Schnaufer'
+    # The sensor associated with the transformer
+    transformer_sensor = 'rgb'
 
-# The email of the author of the extractor
-AUTHOR_EMAIL = 'schnaufer@email.arizona.edu'
+    # The transformer type (eg: 'rgbmask', 'plotclipper')
+    transformer_type = 'opendronemap'
 
-# Contributors to this transformer
-CONTRUBUTORS = []
+    # The name of the author of the extractor
+    author_name = 'Chris Schnaufer'
 
-# Repository URI of where the source code lives
-REPOSITORY = 'https://github.com/AgPipeline/transformer-opendronemap.git'
+    # The email of the author of the extractor
+    author_email = 'schnaufer@email.arizona.edu'
 
-# Override flag for disabling the metadata file requirement.
-# Uncomment and set to False to override default behavior
-#METADATA_NEEDED = True
+    # Contributors to this transformer
+    contributors = []
+
+    # Repository URI of where the source code lives
+    repository = 'https://github.com/AgPipeline/transformer-opendronemap.git'
+
+    # Override flag for disabling the metadata file requirement.
+    # Uncomment and set to False to override default behavior
+    # metadata_needed = True

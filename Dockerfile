@@ -40,8 +40,12 @@ RUN (echo "installing osgeo dependencies" && \
     rm -rf /var/lib/apt/lists/*)
 
 USER extractor
-ENTRYPOINT ["/home/extractor/entrypoint.py"]
+COPY configuration.py odm.py /home/extractor/
 
-COPY *.py settings.yaml /home/extractor/
+USER root
+RUN chmod a+x /home/extractor/odm.py
+
+USER extractor
+ENTRYPOINT ["/home/extractor/odm.py"]
 
 ENV PYTHONPATH="${PYTHONPATH}:/code"
