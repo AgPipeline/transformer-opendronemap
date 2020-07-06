@@ -40,7 +40,7 @@ jobs:
         id: install-python-numpy
       - name: Install Python pygdal
         shell: bash
-        run: 'sudo python3 -m pip install --no-cache-dir pygdal==2.4.4.*'
+        run: 'sudo python3 -m pip install --no-cache-dir pygdal==2.2.3.*'
         id: install-python-pygdal
 
 
