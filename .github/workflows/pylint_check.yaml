@@ -30,6 +30,9 @@ jobs:
         run: python3 -m pip install --upgrade --no-cache-dir pylint
         id: pylint-install
 
+      - name: python3 version
+        run: python3 --version
+
       - name: Install system requirements
         shell: bash
         run: 'sudo apt-get install -y python3-gdal gdal-bin libgdal-dev gcc g++ python3.7-dev'
