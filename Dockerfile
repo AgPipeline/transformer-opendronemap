@@ -1,5 +1,5 @@
 # Version 1.0 template-transformer-simple 
-FROM opendronemap/odm:0.9.1
+FROM opendronemap/odm:0.7.0
 LABEL maintainer="Chris Schnaufer <schnaufer@email.arizona.edu>"
 
 RUN useradd -u 49044 extractor \
@@ -13,8 +13,17 @@ USER root
 
 RUN [ -s /home/extractor/packages.txt ] && \
     (echo 'Installing packages' && \
+        apt-get install software-properties-common && \
+        add-apt-repository -y ppa:deadsnakes/ppa && \
         apt-get update && \
+        apt-get install -y python3.7 && \
+        ln -f /usr/bin/python3.7 /usr/bin/python3 && \
+        ln -f /usr/bin/python3.7m /usr/bin/python3m && \
+        python3 --version && \
         cat /home/extractor/packages.txt | xargs apt-get install -y --no-install-recommends && \
+        apt-get install -y python3-gdal gdal-bin libgdal-dev gcc g++ python3.7-dev python3-wheel && \
+        python3 -m pip install --upgrade --no-cache-dir pip && \
+        python3 -m pip install --upgrade --no-cache-dir numpy && \
         rm /home/extractor/packages.txt && \
         apt-get autoremove -y && \
         apt-get clean && \
@@ -32,7 +41,7 @@ RUN [ -s /home/extractor/requirements.txt ] && \
      rm /home/extractor/requirements.txt)
 
 USER extractor
-COPY configuration.py odm.py /home/extractor/
+COPY configuration.py odm.py worker.py settings.yaml /home/extractor/
 
 USER root
 RUN chmod a+x /home/extractor/odm.py
