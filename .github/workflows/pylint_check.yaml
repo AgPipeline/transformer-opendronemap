@@ -21,8 +21,14 @@ jobs:
         run: sudo apt-get install software-properties-common
       - name: add deadsnakes repository
         run: sudo add-apt-repository -y ppa:deadsnakes/ppa
+      - name: add gdal repository
+        run: sudo add-apt-repository ppa:ubuntugis/ppa
       - name: update apt-get
         run: sudo apt-get update
+      - name: install gdal-deps
+        run: sudo apt-get install -y gdal-bin libgdal-dev gcc g++
+
+
       - name: test python version
         run: python3 --version
       - name: install python3.7
@@ -34,10 +40,8 @@ jobs:
         run: python3 --version
 
 
-      - name: add gdal repository
-        run: sudo add-apt-repository ppa:ubuntugis/ppa && sudo apt-get update
-      - name: install gdal-deps
-        run: sudo apt-get install -y gdal-bin libgdal-dev gcc g++
+
+
 
       - name: find gdal version
         run: ogrinfo --version
