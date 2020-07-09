@@ -17,6 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Running pylint checks
     steps:
+      - name: get software-properties-common
+        run: sudo apt-get install software-properties-common
       - name: update apt-get
         run: sudo apt-get update
       - name: install python3.7
@@ -32,8 +34,8 @@ jobs:
       - name: find gdal version
         run: ogrinfo --version
 
-      - name: install gdal
-        run: python3 -m pip install GDAL==2.4.2.*
+#      - name: install gdal
+#        run: python3 -m pip install GDAL==
 
 
 #      - name: Install Python 3.7
