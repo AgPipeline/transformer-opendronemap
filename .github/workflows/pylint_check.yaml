@@ -25,10 +25,10 @@ jobs:
         run: sudo apt-get update
       - name: install python3.7
         run: sudo apt-get install -y python3.7
-      - name: put into correct location
-        run: ln -f /usr/bin/python3.7 /usr/bin/python3
-      - name: put into correct location (2)
-        run: ln -f /usr/bin/python3.7m /usr/bin/python3m
+#      - name: put into correct location
+#        run: ln -f /usr/bin/python3.7 /usr/bin/python3
+#      - name: put into correct location (2)
+#        run: ln -f /usr/bin/python3.7m /usr/bin/python3m
       - name: test python version
         run: python3 --version
 
