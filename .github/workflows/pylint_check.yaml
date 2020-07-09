@@ -73,7 +73,7 @@ jobs:
         id: find-python-files
       - name: Install system requirements from source
         shell: bash
-        run: '[ -s "packages.txt" ] && (cat packages.txt | xargs apt-get install -y --no-install-recommends) || (echo "No addtional packages to install")'
+        run: 'sudo [ -s "packages.txt" ] && (cat packages.txt | xargs apt-get install -y --no-install-recommends) || (echo "No addtional packages to install")'
         id: install-system-reqs
       - name: Install Python requirements from source
         shell: bash
