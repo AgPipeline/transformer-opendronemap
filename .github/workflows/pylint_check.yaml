@@ -28,9 +28,13 @@ jobs:
       - name: test python version
         run: python3 --version
 
-
+      - name: remove python3-apt
+        run: sudo apt-get remove python3-apt
+      - name: add python3-apt back
+        run: sudo apt-get install python3-apt
       - name: get software-properties-common
         run: sudo apt-get install software-properties-common
+
       - name: add gdal repository
         run: sudo add-apt-repository ppa:ubuntugis/ppa && sudo apt-get update
       - name: install gdal-deps
