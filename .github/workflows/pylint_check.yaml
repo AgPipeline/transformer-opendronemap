@@ -25,7 +25,7 @@ jobs:
 #        run: sudo apt-get update
 
       - name: install python3.7
-        run: sudo apt-get install -y --no-install-recommends python3.7 python3-pip && sudo ln -sfn /usr/bin/python3.7 /usr/bin/python3
+        run: sudo apt-get install -y --no-install-recommends python3.7-dev python3-pip && sudo ln -sfn /usr/bin/python3.7 /usr/bin/python3
       - name: test python version
         run: python3 --version
 
