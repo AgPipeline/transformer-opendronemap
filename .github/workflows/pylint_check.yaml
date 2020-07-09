@@ -24,10 +24,14 @@ jobs:
       - name: add gdal repository
         run: sudo add-apt-repository ppa:ubuntugis/ppa
       - name: update apt-get
-        run: sudo apt-get update && sudo apt-get upgrade
+        run: sudo apt-get update
       - name: install gdal-deps
         run: sudo apt-get install -y gdal-bin libgdal-dev gcc g++
 
+      - name: Install system requirements from source
+        shell: bash
+        run: '[ -s "packages.txt" ] && (cat packages.txt | xargs apt-get install -y --no-install-recommends) || (echo "No addtional packages to install")'
+        id: install-system-reqs
 
       - name: test python version
         run: python3 --version
@@ -71,10 +75,6 @@ jobs:
       - name: Finding files
         run: find . -type f -name "*.py" > action_pylint_files.txt
         id: find-python-files
-      - name: Install system requirements from source
-        shell: bash
-        run: '[ -s "packages.txt" ] && (cat packages.txt | xargs apt-get install -y --no-install-recommends) || (echo "No addtional packages to install")'
-        id: install-system-reqs
       - name: Install Python requirements from source
         shell: bash
         run: '[ -s "requirements.txt" ] && (python3 -m pip install --no-cache-dir -r requirements.txt) || (echo "No Python packages to install")'
