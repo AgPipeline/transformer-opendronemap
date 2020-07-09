@@ -17,23 +17,22 @@ jobs:
     runs-on: ubuntu-latest
     name: Running pylint checks
     steps:
-
-#      - name: add deadsnakes repository
-#        run: sudo add-apt-repository -y ppa:deadsnakes/ppa
-
+      - name: install software-properties-common
+        run: sudo apt-get install software-properties-common
+      - name: add deadsnakes repository
+        run: sudo add-apt-repository -y ppa:deadsnakes/ppa
       - name: update apt-get
         run: sudo apt-get update
       - name: test python version
         run: python3 --version
       - name: install python3.7
-        run: sudo apt-get install -y --no-install-recommends python3.7-dev python3-pip && sudo ln -sfn /usr/bin/python3.7 /usr/bin/python3
+        run: sudo apt-get install -y python3.7 && sudo ln -f /usr/bin/python3.7 /usr/bin/python3 && ln -f /usr/bin/python3.7m /usr/bin/python3m
+        #run: sudo apt-get install -y --no-install-recommends python3.7-dev python3-pip && sudo ln -sfn /usr/bin/python3.7 /usr/bin/python3
       - name: update apt-get
         run: sudo apt-get update
       - name: test python version2
         run: python3 --version
 
-      - name: get software-properties-common
-        run: sudo apt-get install software-properties-common
 
       - name: add gdal repository
         run: sudo add-apt-repository ppa:ubuntugis/ppa && sudo apt-get update
