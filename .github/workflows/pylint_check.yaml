@@ -17,8 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Running pylint checks
     steps:
-#      - name: get software-properties-common
-#        run: sudo apt-get install software-properties-common
+
 #      - name: add deadsnakes repository
 #        run: sudo add-apt-repository -y ppa:deadsnakes/ppa
 #      - name: update apt-get
@@ -29,6 +28,8 @@ jobs:
       - name: test python version
         run: python3 --version
 
+      - name: get software-properties-common
+        run: sudo apt-get install software-properties-common
       - name: add gdal repository
         run: sudo add-apt-repository ppa:ubuntugis/ppa && sudo apt-get update
       - name: install gdal-deps
