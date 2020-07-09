@@ -25,13 +25,11 @@ jobs:
         run: sudo apt-get update
       - name: install python3.7
         run: sudo apt-get install -y --no-install-recommends python3.7-dev python3-pip && sudo ln -sfn /usr/bin/python3.7 /usr/bin/python3
+      - name: update apt-get
+        run: sudo apt-get update
       - name: test python version
         run: python3 --version
 
-      - name: remove python3-apt
-        run: sudo apt-get remove python3-apt
-      - name: add python3-apt back
-        run: sudo apt-get install python3-apt
       - name: get software-properties-common
         run: sudo apt-get install software-properties-common
 
