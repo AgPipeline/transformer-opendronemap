@@ -39,15 +39,11 @@ jobs:
       - name: test python version2
         run: python3 --version
 
-
-
-
-
       - name: find gdal version
         run: ogrinfo --version
 
-#      - name: install gdal
-#        run: python3 -m pip install GDAL==
+      - name: install gdal
+        run: python3 -m pip install GDAL==2.4.2.*
 
 
 #      - name: Install Python 3.7
