@@ -28,8 +28,8 @@ jobs:
       - name: install python3.7
         run: sudo apt-get install -y python3.7 && sudo ln -f /usr/bin/python3.7 /usr/bin/python3
         #run: sudo apt-get install -y --no-install-recommends python3.7-dev python3-pip && sudo ln -sfn /usr/bin/python3.7 /usr/bin/python3
-      - name: update apt-get
-        run: sudo apt-get update
+#      - name: update apt-get
+#        run: sudo apt-get update
       - name: test python version2
         run: python3 --version
 
