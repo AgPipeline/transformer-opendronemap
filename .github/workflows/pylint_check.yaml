@@ -17,18 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     name: Running pylint checks
     steps:
-      - name: get software-properties-common
-        run: sudo apt-get install software-properties-common
-      - name: add deadsnakes repository
-        run: sudo add-apt-repository -y ppa:deadsnakes/ppa
       - name: update apt-get
         run: sudo apt-get update
       - name: install python3.7
-        run: sudo apt-get install -y python3.7
-#      - name: put into correct location
-#        run: ln -f /usr/bin/python3.7 /usr/bin/python3
-#      - name: put into correct location (2)
-#        run: ln -f /usr/bin/python3.7m /usr/bin/python3m
+        run: sudo apt-get install -y --no-install-recommends python3.7 python3-pip && sudo ln -sfn /usr/bin/python3.7 /usr/bin/python3
       - name: test python version
         run: python3 --version
 
@@ -40,8 +32,8 @@ jobs:
       - name: find gdal version
         run: ogrinfo --version
 
-#      - name: install gdal
-#        run: python3 -m pip install GDAL==
+      - name: install gdal
+        run: python3 -m pip install GDAL==2.4.2.*
 
 
 #      - name: Install Python 3.7
