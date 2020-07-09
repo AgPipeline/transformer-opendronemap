@@ -18,13 +18,13 @@ jobs:
     name: Running pylint checks
     steps:
       - name: get software-properties-common
-        run: apt-get install software-properties-common
+        run: sudo apt-get install software-properties-common
       - name: add deadsnakes repository
-        run: add-apt-repository -y ppa:deadsnakes/ppa
+        run: sudo add-apt-repository -y ppa:deadsnakes/ppa
       - name: update apt-get
-        run: apt-get update
+        run: sudo apt-get update
       - name: install python3.7
-        run: apt-get install -y python3.7
+        run: sudo apt-get install -y python3.7
       - name: put into correct location
         run: ln -f /usr/bin/python3.7 /usr/bin/python3
       - name: put into correct location (2)
