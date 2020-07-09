@@ -17,17 +17,19 @@ jobs:
     runs-on: ubuntu-latest
     name: Running pylint checks
     steps:
-      - name: get software-properties-common
-        run: sudo apt-get install software-properties-common
-      - name: update apt-get
-        run: sudo apt-get update
-      - name: install python3.7
+#      - name: get software-properties-common
+#        run: sudo apt-get install software-properties-common
+#      - name: add deadsnakes repository
+#        run: sudo add-apt-repository -y ppa:deadsnakes/ppa
+#      - name: update apt-get
+#        run: sudo apt-get update
+#      - name: install python3.7
         run: sudo apt-get install -y --no-install-recommends python3.7 python3-pip && sudo ln -sfn /usr/bin/python3.7 /usr/bin/python3
       - name: test python version
         run: python3 --version
 
       - name: add gdal repository
-        run: sudo add-apt-repository ppa:ubuntugis/ppa
+        run: sudo add-apt-repository ppa:ubuntugis/ppa && sudo apt-get update
       - name: install gdal-deps
         run: sudo apt-get install -y gdal-bin libgdal-dev gcc g++
 
