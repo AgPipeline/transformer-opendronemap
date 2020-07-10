@@ -63,7 +63,7 @@ jobs:
       - name: numpy install
         run: python3 -m pip install --upgrade --no-cache-dir numpy
       - name: pygdal install
-        run: python3 -m pip install --no-cache-dir pygdal==2.2.2.*
+        run: python3 -m pip install --no-cache-dir pygdal==2.4.2.*
 
 
       - name: Fetch/update pylint
