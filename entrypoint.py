@@ -355,7 +355,7 @@ def add_parameters(parser, transformer_instance):
         transformer_instance.add_parameters(parser)
 
     # Check if the transformer has a function defined to extend command line arguments
-    # pylint: disable=no-value-for-parameter
+
     if hasattr(Opendronemap, 'add_parameters'):
         Opendronemap.add_parameters(parser)
 
