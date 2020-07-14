@@ -44,11 +44,11 @@ jobs:
         run: python3 -m pip install --upgrade --no-cache-dir setuptools
         id: setuptools-install
       - name: install gdal
-        run: python3 -m pip install --upgrade --no-cache-dir GDAL==2.4.4.*
+        run: python3 -m pip install --upgrade --no-cache-dir GDAL==2.4.2.*
       - name: numpy install
         run: python3 -m pip install --upgrade --no-cache-dir numpy
       - name: pygdal install
-        run: python3 -m pip install --upgrade --no-cache-dir pygdal==2.4.4.*
+        run: python3 -m pip install --upgrade --no-cache-dir pygdal==2.4.2.*
       - name: Fetch/update pylint
         run: python3 -m pip install --upgrade --no-cache-dir pylint
         id: pylint-install
