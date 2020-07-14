@@ -3,6 +3,5 @@ enum34
 piexif
 pika==1.0.0
 pygdal==2.4.4.*
-#GDAL==2.2.2.*
 agpypeline==0.0.31
 PyYAML
