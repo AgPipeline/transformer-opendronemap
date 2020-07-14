@@ -47,8 +47,14 @@ jobs:
         run: python3 -m pip install --upgrade --no-cache-dir GDAL==2.4.2.*
       - name: numpy install
         run: python3 -m pip install --upgrade --no-cache-dir numpy
+      - name: enum34 install
+        run: python3 -m pip install --upgrade --no-cache-dir enum34
+      - name: piexif install
+        run: python3 -m pip install --upgrade --no-cache-dir piexif
       - name: pygdal install
         run: python3 -m pip install --upgrade --no-cache-dir pygdal==2.4.2.*
+      - name: agpypeline install
+        run: python3 -m pip install --upgrade --no-cache-dir agpypeline==0.0.33
       - name: Fetch/update pylint
         run: python3 -m pip install --upgrade --no-cache-dir pylint
         id: pylint-install
@@ -58,10 +64,10 @@ jobs:
       - name: Finding files
         run: find . -type f -name "*.py" > action_pylint_files.txt
         id: find-python-files
-      - name: Install Python requirements from source
-        shell: bash
-        run: '[ -s "requirements.txt" ] && (python3 -m pip install --no-cache-dir -r requirements.txt) || (echo "No Python packages to install")'
-        id: install-python-reqs
+#      - name: Install Python requirements from source
+#        shell: bash
+#        run: '[ -s "requirements.txt" ] && (python3 -m pip install --no-cache-dir -r requirements.txt) || (echo "No Python packages to install")'
+#        id: install-python-reqs
       - name: Run action pylint script
         shell: bash
         run: '[ -s ".github/workflows/action_pylint.sh" ] && (chmod +x ".github/workflows/action_pylint.sh" && ./.github/workflows/action_pylint.sh) || (echo "Not running special action script - empty or not found")'
