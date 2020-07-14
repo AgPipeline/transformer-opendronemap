@@ -12,7 +12,7 @@ import transformer_class
 
 # From derived images
 import configuration
-import transformer
+import odm
 
 
 class __internal__:
@@ -216,8 +216,8 @@ class __internal__:
         """
         result = {}
 
-        if hasattr(transformer, 'check_continue'):
-            check_result = transformer.check_continue(transformer_instance, **transformer_params)
+        if hasattr(odm, 'check_continue'):
+            check_result = odm.check_continue(transformer_instance, **transformer_params)
             result_code, result_message = __internal__.parse_continue_result(check_result)
 
             if result_code:
@@ -279,7 +279,7 @@ class __internal__:
             transformer_params = {}
 
         # First check if the transformer thinks everything is in place
-        if hasattr(transformer, 'check_continue'):
+        if hasattr(odm, 'check_continue'):
             result = __internal__.handle_check_continue(transformer_instance, transformer_params)
             if 'code' in result and result['code'] < 0 and 'error' not in result:
                 result['error'] = "Unknown error returned from check_continue call"
@@ -292,8 +292,8 @@ class __internal__:
 
         # Next make the call to perform the processing
         if 'error' not in result:
-            if hasattr(transformer, 'perform_process'):
-                result = transformer.perform_process(transformer_instance, **transformer_params)
+            if hasattr(odm, 'perform_process'):
+                result = odm.perform_process(transformer_instance, **transformer_params)
             else:
                 logging.debug("Transformer module is missing function named 'perform_process'")
                 return __internal__.handle_error(-102, "Transformer perform_process interface is not available " +
@@ -403,7 +403,7 @@ def do_work(parser, **kwargs):
 
 if __name__ == "__main__":
     try:
-        PARSER = argparse.ArgumentParser(description=configuration.TRANSFORMER_DESCRIPTION)
+        PARSER = argparse.ArgumentParser(description=configuration.transformer_description)
         do_work(PARSER)
     except Exception as ex:
         logging.error("Top level exception handler caught an exception: %s", str(ex))
