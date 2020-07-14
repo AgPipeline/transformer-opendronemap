@@ -64,10 +64,6 @@ jobs:
       - name: Finding files
         run: find . -type f -name "*.py" > action_pylint_files.txt
         id: find-python-files
-#      - name: Install Python requirements from source
-#        shell: bash
-#        run: '[ -s "requirements.txt" ] && (python3 -m pip install --no-cache-dir -r requirements.txt) || (echo "No Python packages to install")'
-#        id: install-python-reqs
       - name: Run action pylint script
         shell: bash
         run: '[ -s ".github/workflows/action_pylint.sh" ] && (chmod +x ".github/workflows/action_pylint.sh" && ./.github/workflows/action_pylint.sh) || (echo "Not running special action script - empty or not found")'
