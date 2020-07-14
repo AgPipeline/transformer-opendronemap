@@ -11,8 +11,8 @@ import yaml
 import transformer_class
 
 # From derived images
-import configuration
-import odm
+from configuration import ConfigurationOdm
+from odm import Opendronemap
 
 
 class __internal__:
@@ -138,13 +138,13 @@ class __internal__:
             Returns True if metadata is required (the default is that it's required), or False if not
         """
         # If we have a variable defined, check the many ways of determining False
-        if hasattr(configuration, "METADATA_NEEDED"):
+        if hasattr(ConfigurationOdm, "METADATA_NEEDED"):
             # We disable this pylint check since we've performed an explicit check above
             # pylint: disable=no-member
-            if not configuration.METADATA_NEEDED:
+            if not ConfigurationOdm.metadata_needed:
                 return False
-            if isinstance(configuration.METADATA_NEEDED, str):
-                if configuration.METADATA_NEEDED.lower().strip() == 'false':
+            if isinstance(ConfigurationOdm.metadata, str):
+                if ConfigurationOdm.metadata_needed.lower().strip() == 'false':
                     return False
         return True
 
@@ -175,10 +175,10 @@ class __internal__:
 
     @staticmethod
     def parse_continue_result(result):
-        """Parses the result of calling transformer.check_continue and returns
+        """Parses the result of calling Opendronemap.check_continue and returns
            the code and/or message
         Arguments:
-            result: the result from calling transformer.check_continue
+            result: the result from calling Opendronemap.check_continue
         Return:
             A tuple containing the result code and result message. One or both of these
             values in the tuple may be None
@@ -207,7 +207,7 @@ class __internal__:
 
     @staticmethod
     def handle_check_continue(transformer_instance, transformer_params):
-        """Handles calling the transformer.check_continue function
+        """Handles calling the Opendronemap.check_continue function
         Arguments:
             transformer_instance: instance of Transformer class
             transformer_params: dictionary of parameters to pass to transform module functions
@@ -216,8 +216,8 @@ class __internal__:
         """
         result = {}
 
-        if hasattr(odm, 'check_continue'):
-            check_result = odm.check_continue(transformer_instance, **transformer_params)
+        if hasattr(Opendronemap, 'check_continue'):
+            check_result = Opendronemap.check_continue(transformer_instance, **transformer_params)
             result_code, result_message = __internal__.parse_continue_result(check_result)
 
             if result_code:
@@ -279,7 +279,7 @@ class __internal__:
             transformer_params = {}
 
         # First check if the transformer thinks everything is in place
-        if hasattr(odm, 'check_continue'):
+        if hasattr(Opendronemap, 'check_continue'):
             result = __internal__.handle_check_continue(transformer_instance, transformer_params)
             if 'code' in result and result['code'] < 0 and 'error' not in result:
                 result['error'] = "Unknown error returned from check_continue call"
@@ -292,8 +292,8 @@ class __internal__:
 
         # Next make the call to perform the processing
         if 'error' not in result:
-            if hasattr(odm, 'perform_process'):
-                result = odm.perform_process(transformer_instance, **transformer_params)
+            if hasattr(Opendronemap, 'perform_process'):
+                result = Opendronemap.perform_process(transformer_instance, **transformer_params)
             else:
                 logging.debug("Transformer module is missing function named 'perform_process'")
                 return __internal__.handle_error(-102, "Transformer perform_process interface is not available " +
@@ -355,8 +355,8 @@ def add_parameters(parser, transformer_instance):
         transformer_instance.add_parameters(parser)
 
     # Check if the transformer has a function defined to extend command line arguments
-    if hasattr(transformer, 'add_parameters'):
-        transformer.add_parameters(parser)
+    if hasattr(Opendronemap, 'add_parameters'):
+        Opendronemap.add_parameters(parser)
 
     # Assume the rest of the arguments are the files
     parser.add_argument('file_list', nargs=argparse.REMAINDER, help='additional files for transformer')
@@ -403,7 +403,7 @@ def do_work(parser, **kwargs):
 
 if __name__ == "__main__":
     try:
-        PARSER = argparse.ArgumentParser(description=configuration.transformer_description)
+        PARSER = argparse.ArgumentParser(description=ConfigurationOdm.transformer_description)
         do_work(PARSER)
     except Exception as ex:
         logging.error("Top level exception handler caught an exception: %s", str(ex))
