@@ -23,7 +23,6 @@ RUN [ -s /home/extractor/packages.txt ] && \
         ln -f /usr/bin/python3.7 /usr/bin/python3 && \
         ln -f /usr/bin/python3.7m /usr/bin/python3m && \
         python3 --version && \
-        ogrinfo --version && \
         apt-get install -y python3.7-dev python3-wheel && \
         rm /home/extractor/packages.txt && \
         apt-get autoremove -y && \
