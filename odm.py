@@ -1,12 +1,17 @@
+#!/usr/bin/env python3
 """OpenDroneMap transformer
 """
 
+import argparse
 import os
 import logging
 import subprocess
-import tempfile
 import time
 import datetime
+from agpypeline import entrypoint, algorithm
+from agpypeline.environment import Environment
+
+from configuration import ConfigurationOdm
 
 # Known image file extensions
 KNOWN_IMAGE_FILE_EXTS = ['.tif', '.tiff', '.jpg']
@@ -34,7 +39,8 @@ RESULT_FILES = {
     ]
 }
 
-class __internal__():
+
+class __internal__:
     """Internal use only class
     """
     def __init__(self):
@@ -89,7 +95,7 @@ class __internal__():
              The path to the project folder
         """
         # Create a temporary folder and link the images to it
-        working_folder = tempfile.mkdtemp(prefix="odm", dir=default_folder)
+        working_folder = default_folder
         logging.debug("Creating project folder at '%s'", working_folder)
         images_folder = os.path.join(working_folder, 'images')
         if not os.path.exists(images_folder):
@@ -198,76 +204,87 @@ class __internal__():
         logging.debug('OpenDroneMap app finished - %s', datetime.datetime.now().isoformat())
         return return_value
 
-def add_parameters(parser):
-    """Adds parameters
-    Arguments:
-        parser: instance of argparse.ArgumentParser
-    """
-    parser.add_argument('--odm_overrides', type=str, help='file containing OpenDroneMap configuration overrides')
 
-    parser.epilog = "accepts a list of files and folders following command line parameters" + \
-                    ("\n" + parser.epilog) if parser.epilog else ""
+class Opendronemap(algorithm.Algorithm):
+    """Runs open drone map"""
+
+    def add_parameters(self, parser: argparse.ArgumentParser):
+        """Adds parameters
+        Arguments:
+            parser: instance of argparse.ArgumentParser
+        """
+        # pylint: disable=no-self-use
+        parser.add_argument('--odm_overrides', type=str, help='file containing OpenDroneMap configuration overrides')
+
+        parser.epilog = "accepts a list of files and folders following command line parameters" + \
+                        ("\n" + parser.epilog) if parser.epilog else ""
+
+    def check_continue(self, environment: Environment, check_md: dict, transformer_md: list, full_md: list) -> tuple:
+        """Checks if conditions are right for continuing processing
+        Arguments:
+            environment: instance of environment class
+            check_md: metadata on the current request
+            transformer_md: the metadata for this transformer
+            full_md: the original metadata for this transformer
+        Return:
+            Returns a tuple containing the return code for continuing or not, and
+            an error message if there's an error
+        """
+        # pylint: disable=unused-argument,no-self-use
+        # Check for ODM override file and make sure we can access it
+        if environment.args.odm_overrides:
+            if not os.path.exists(environment.args.odm_overrides):
+                return (-1000, "OpenDroneMap overrides specified but file is not available: '%s'" %
+                        environment.args.odm_overrides)
+
+        # Check that there's at least one image file in the list of files
+        for one_file in check_md['list_files']():
+            logging.debug("Checking if image file: %s", one_file)
+            if __internal__.check_for_image_file(one_file):
+                logging.debug("Found an image file")
+                return 0
+
+        return (-1001, "Unable to find an image file in files to process. Accepting files types: '%s'" %
+                ", ".join(KNOWN_IMAGE_FILE_EXTS))
+
+    def perform_process(self, environment: Environment, check_md: dict, transformer_md: dict,
+                        full_md: list) -> dict:
+        """Performs the processing of the data
+        Arguments:
+            environment: instance of environment class
+            check_md: metadata on the current request
+            transformer_md: the metadata for this transformer
+            full_md: the original metadata for this transformer
+        Return:
+            Returns a dictionary with the results of processing
+        """
+        # pylint: disable=unused-argument,no-self-use
+        # Create a temporary project folder and link all available images to that folder
+        project_path = __internal__.prepare_project_folder(check_md['list_files'](), check_md['working_folder'])
+
+        # Process the images
+        logging.debug("Calling ODM with project path: %s", str(project_path))
+        stitch_code = __internal__.run_stitch(project_path, environment.args.odm_overrides)
+
+        # Provide a list of returned files
+        files_md = []
+        for result_folder, result_files in RESULT_FILES.items():
+            result_path = os.path.join(project_path, result_folder)
+            if isinstance(result_files, dict):
+                result_files = [result_files]
+            for one_file in result_files:
+                cur_path = os.path.join(result_path, one_file['name'])
+                if os.path.exists(cur_path):
+                    files_md.append({
+                        'path': cur_path,
+                        'key': one_file['type']
+                    })
+
+        return {'file': files_md,
+                'code': stitch_code
+                }
 
 
-def check_continue(transformer, check_md, transformer_md, full_md):
-    """Checks if conditions are right for continuing processing
-    Arguments:
-        transformer: instance of transformer class
-        check_md: metadata on the current request
-        transformer_md: the metadata for this transformer
-        full_md: the original metadata for this transformer
-    Return:
-        Returns a tuple containing the return code for continuing or not, and
-        an error message if there's an error
-    """
-    # pylint: disable=unused-argument
-    # Check for ODM override file and make sure we can access it
-    if transformer.args.odm_overrides:
-        if not os.path.exists(transformer.args.odm_overrides):
-            return (-1000, "OpenDroneMap overrides specified but file is not available: '%s'" % transformer.args.odm_overrides)
-
-    # Check that there's at least one image file in the list of files
-    for one_file in check_md['list_files']():
-        logging.debug("Checking if image file: %s", one_file)
-        if __internal__.check_for_image_file(one_file):
-            logging.debug("Found an image file")
-            return 0
-
-    return (-1001, "Unable to find an image file in files to process. Accepting files types: '%s'" % ", ".join(KNOWN_IMAGE_FILE_EXTS))
-
-
-def perform_process(transformer, check_md, transformer_md, full_md):
-    """Performs the processing of the data
-    Arguments:
-        transformer: instance of transformer class
-        check_md: metadata on the current request
-        transformer_md: the metadata for this transformer
-        full_md: the original metadata for this transformer
-    Return:
-        Returns a dictionary with the results of processing
-    """
-    # pylint: disable=unused-argument
-    # Create a temporary project folder and link all available images to that folder
-    project_path = __internal__.prepare_project_folder(check_md['list_files'](), check_md['working_folder'])
-
-    # Process the images
-    logging.debug("Calling ODM with project path: %s", str(project_path))
-    stitch_code = __internal__.run_stitch(project_path, transformer.args.odm_overrides)
-
-    # Provide a list of returned files
-    files_md = []
-    for result_folder, result_files in RESULT_FILES.items():
-        result_path = os.path.join(project_path, result_folder)
-        if isinstance(result_files, dict):
-            result_files = [result_files]
-        for one_file in result_files:
-            cur_path = os.path.join(result_path, one_file['name'])
-            if os.path.exists(cur_path):
-                files_md.append({
-                    'path': cur_path,
-                    'key': one_file['type']
-                })
-
-    return {'file': files_md,
-            'code': stitch_code
-            }
+if __name__ == "__main__":
+    CONFIGURATION = ConfigurationOdm()
+    entrypoint.entrypoint(CONFIGURATION, Opendronemap())

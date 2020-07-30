@@ -1,4 +1,7 @@
+numpy
 enum34
 piexif
 pika==1.0.0
-pyclowder
+pygdal==2.2.2.*
+agpypeline==0.0.34
+PyYAML
