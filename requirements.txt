@@ -1,7 +1,7 @@
 numpy
 enum34
 piexif
-pika==1.0.0
-pygdal==2.2.2.*
+pika
+pygdal==3.0.4.*
 agpypeline
 PyYAML
