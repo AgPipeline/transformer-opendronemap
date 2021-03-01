@@ -17,7 +17,7 @@ on:
 
 jobs:
   update_python:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     name: Running pylint checks
     steps:
       - name: install software-properties-common
