@@ -183,6 +183,7 @@ class __internal__:
 
         # Start the process
         logging.info("Starting ODM script at: %s", script_path)
+        # pylint: disable=consider-using-with
         proc = subprocess.Popen([script_path, "code"], bufsize=-1, env=my_env,
                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
