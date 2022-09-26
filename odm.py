@@ -214,7 +214,6 @@ class Opendronemap(algorithm.Algorithm):
         Arguments:
             parser: instance of argparse.ArgumentParser
         """
-        # pylint: disable=no-self-use
         parser.add_argument('--odm_overrides', type=str, help='file containing OpenDroneMap configuration overrides')
 
         parser.epilog = "accepts a list of files and folders following command line parameters" + \
@@ -231,7 +230,7 @@ class Opendronemap(algorithm.Algorithm):
             Returns a tuple containing the return code for continuing or not, and
             an error message if there's an error
         """
-        # pylint: disable=unused-argument,no-self-use
+        # pylint: disable=unused-argument
         # Check for ODM override file and make sure we can access it
         if environment.args.odm_overrides:
             if not os.path.exists(environment.args.odm_overrides):
@@ -259,7 +258,7 @@ class Opendronemap(algorithm.Algorithm):
         Return:
             Returns a dictionary with the results of processing
         """
-        # pylint: disable=unused-argument,no-self-use
+        # pylint: disable=unused-argument
         # Create a temporary project folder and link all available images to that folder
         project_path = __internal__.prepare_project_folder(check_md['list_files'](), check_md['working_folder'])
 
